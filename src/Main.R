@@ -157,6 +157,13 @@ merged_df <- merge(y_summary_imputed_df, a_summary_imputed_df,
 
 sig_merged_df <- subset(merged_df, PValue.youth < (alpha/m) | PValue.adult < (alpha/m))
 
+# prune incomplete records
+merged_call_df <- na.omit(sig_merged_df)
+
+diff_questions_df <- subset(merged_call_df, 
+                            ConfHigh.youth < ConfLow.adult
+                            | ConfHigh.adult < ConfLow.youth)
+
 #########################################################################
 ## Save Intermediate Results
 #########################################################################
@@ -166,5 +173,6 @@ write.csv(y_summary_df, file='../calc/y_summary_df.csv', row.names= FALSE);
 write.csv(a_summary_df, file='../calc/a_summary_df.csv', row.names= FALSE);
 write.csv(merged_df, file='../calc/merged_df.csv', row.names= FALSE);
 write.csv(sig_merged_df, file='../calc/sig_merged_df.csv', row.names= FALSE);
+write.csv(diff_questions_df, file='../calc/diff_questions_df.csv', row.names = FALSE);
 
 print("All done.");

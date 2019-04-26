@@ -23,12 +23,7 @@ y_summary_df <- read.csv('../calc/y_summary_df.csv')
 merged_df <- read.csv('../calc/merged_df.csv')
 sig_merged_df <- read.csv('../calc/sig_merged_df.csv')
 
-# prune incomplete records
-merged_call_df <- na.omit(sig_merged_df)
-
-diff_questions_df <- subset(merged_call_df, 
-                            ConfHigh.youth < ConfLow.adult
-                            | ConfHigh.adult < ConfLow.youth)
+diff_questions_df <- read.csv('../calc/diff_questions_df.csv')
 
 comparable_fields <- read.csv('../data/screening/screenvars.csv',
                   sep=',', na.strings = c('.'));
@@ -174,6 +169,10 @@ dist_mat[,'CIGEVER'] <- -1 * (dist_mat[,'CIGEVER'] - 1);
 dist_mat[,'FUALC18'] <- -1 * (dist_mat[,'FUALC18'] - 1);
 dist_mat[,'FUCIG18'] <- -1 * (dist_mat[,'FUCIG18'] - 1);
 dist_mat[,'FUCIG21'] <- -1 * (dist_mat[,'FUCIG21'] - 1);
+dist_mat[,'YOWRPROB'] <- -1 * (dist_mat[,'YOWRPROB'] - 1);
+dist_mat[,'IRMCDCHP'] <- -1 * (dist_mat[,'IRMCDCHP'] - 1);
+dist_mat[,'DIFFTHINK'] <- -1 * (dist_mat[,'DIFFTHINK'] - 1);
+dist_mat[,'CAIDCHIP'] <- -1 * (dist_mat[,'CAIDCHIP'] - 1);
 
 colnames(dist_mat) <- code2desc[[colnames(dist_mat)]];
 jaccard_dist <- dist(t(dist_mat), method='binary')
@@ -215,4 +214,8 @@ aspect_ratio <- 20/12;
 
 ggsave('../calc/diff_questions_renamed.png', height = ht, width = ht*aspect_ratio)
 
+# Remove ggplots issue file for ggsave() bug
+# https://github.com/tidyverse/ggplot2/issues/2787
+file.exists("Rplots.pdf");
+file.remove("Rplots.pdf");
 
