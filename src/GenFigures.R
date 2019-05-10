@@ -6,6 +6,8 @@
 library(ggplot2)
 library(hashmap)
 library(stringr)
+library(ggsci)
+library(ape)
 
 #########################################################################
 ## Load Data
@@ -156,7 +158,8 @@ print("Run complete-clustering with Jaccard distance")
 # Try with Jaccard index
 dist_rdf <- rdf[,colnames(rdf) %in% comparable_fields$ColName];
 dist_rdf <- dist_rdf[,boolvars];
-dist_rdf <- dist_rdf[,colnames(dist_rdf) %in% as.character(diff_questions_df$Name)]
+dist_rdf <- dist_rdf[,colnames(dist_rdf) %in% as.character(diff_questions_df$Name)];
+dist_rdf <- dist_rdf[,!(colnames(dist_rdf) %in% 'ADWRPROB')]; # remove ADWRPROB from clustering
 dist_rdf <- na.omit(dist_rdf);
 
 # set all columns to 0/1 for correlation
@@ -176,8 +179,16 @@ dist_mat[,'CAIDCHIP'] <- -1 * (dist_mat[,'CAIDCHIP'] - 1);
 
 colnames(dist_mat) <- code2desc[[colnames(dist_mat)]];
 jaccard_dist <- dist(t(dist_mat), method='binary')
-
 hc <- hclust(as.dist(jaccard_dist));
+
+n_clust <- 7;
+clust_colors <- pal_d3()(n_clust)
+clust_defs = cutree(hc, n_clust)
+
+png("../calc/clusterdend.png", width = 900, height = 600)
+plot(as.phylo(hc), tip.color = clust_colors[clust_defs], 
+     cex = 1, label.offset = 0.05)
+dev.off();
 
 #########################################################################
 ## Build Main Plot
@@ -201,7 +212,6 @@ adult_renamed_pt_df <- data.frame(
 )
 
 barbox_renamed_df <- rbind(youth_renamed_pt_df, adult_renamed_pt_df)
-barbox_renamed_df$name <- factor(barbox_renamed_df$name, hc$labels);
 barbox_renamed_df$name <- str_wrap(barbox_renamed_df$name, width=50)
 
 ggplot(barbox_renamed_df, aes(x=name, y=lod, group=Age, color=Age)) +
