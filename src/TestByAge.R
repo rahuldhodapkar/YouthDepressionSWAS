@@ -65,9 +65,9 @@ agecode2minage <- hashmap(
 );
 
 #########################################################################
-## Extract Date Onset Information
+## Lifetime MDE
 #########################################################################
-print("Age of Onset of Depression")
+print("Lifetime (within last year) MDE")
 
 onset_ages_12_17 <- subset(rdf, AGE2 > 0
                            & AGE2 <= 6
@@ -136,9 +136,9 @@ ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
 ggsave('../calc/lifetime_granular_onset_age.png', width = 8, height = 7)
 
 #########################################################################
-## For Active Depression
+## For Active MDEs
 #########################################################################
-print("Age of Onset of Depression")
+print("Active (within last year) MDE")
 
 onset_ages_12_17 <- subset(rdf, AGE2 > 0
                            & AGE2 <= 6
@@ -206,13 +206,78 @@ ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
 
 ggsave('../calc/active_granular_onset_age.png', width = 8, height = 7)
 
+#########################################################################
+## Lifetime but Not Active
+#########################################################################
+print("Lifetime MDE but *not* active (w/in last year)")
+
+onset_ages_12_17 <- subset(rdf, AGE2 > 0
+                           & AGE2 <= 6
+                           & YMDELT == 1 
+                           & YMDEYR == 2
+                           & YOPBRMBR == 1
+                           & YOPBAGE < 150)$YOPBAGE;
+
+onset_ages_18_25 <- subset(rdf, AGE2 > 6
+                           & AGE2 <= 12
+                           & AMDELT == 1 
+                           & AMDEYR == 2
+                           & ADPBRMBR == 1
+                           & ADPBAGE < 150)$ADPBAGE;
+
+onset_ages_26_34 <- subset(rdf, AGE2 > 12
+                           & AGE2 <= 13
+                           & AMDELT == 1 
+                           & AMDEYR == 2
+                           & ADPBRMBR == 1
+                           & ADPBAGE < 150)$ADPBAGE;
 
 
+onset_ages_35_49 <- subset(rdf, AGE2 > 14
+                           & AGE2 <= 15
+                           & AMDELT == 1 
+                           & AMDEYR == 2
+                           & ADPBRMBR == 1
+                           & ADPBAGE < 150)$ADPBAGE;
 
+onset_ages_50_plus <- subset(rdf, AGE2 > 15
+                             & AMDELT == 1 
+                             & AMDEYR == 2
+                             & ADPBRMBR == 1
+                             & ADPBAGE < 150)$ADPBAGE;
 
+age_df <- data.frame(
+  age = c(
+    onset_ages_12_17,
+    onset_ages_18_25,
+    onset_ages_26_34,
+    onset_ages_35_49,
+    onset_ages_50_plus
+  ),
+  group = c(
+    rep('12-17', length(onset_ages_12_17)),
+    rep('18-25', length(onset_ages_18_25)),
+    rep('26-34', length(onset_ages_26_34)),
+    rep('35-49', length(onset_ages_35_49)),
+    rep('50+', length(onset_ages_50_plus))
+  )
+);
 
+ggplot(age_df, aes(x=age, color=group, fill=group)) +
+  geom_density(alpha=0.4) +
+  xlab('Recalled Age of First MDE') +
+  labs(color="Age Group", fill="Age Group") + 
+  ggtitle('Liftime, Not Active (Past-Year) Depression')
 
+ggsave('../calc/lifetime_not_active_coarse_onset_age.png', width = 8, height = 7)
 
+all_age_df <- subset(rdf, AMDEYR == 2 & AMDELT == 1
+                     & ADPBAGE < 150);
+all_age_df$group <- agecode2minage[[all_age_df$AGE2]]
+ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
+  geom_density(alpha=0.4) +
+  xlab('Recalled Age of First MDE') +
+  labs(color="Age Group", fill="Age Group") + 
+  ggtitle('Liftime, Not Active (Past-Year) Depression')
 
-
-
+ggsave('../calc/lifetime_not_active_granular_onset_age.png', width = 8, height = 7)
