@@ -9,3 +9,7 @@ packaged with the repository and should be sufficient to load all required data.
 
 ## Run Analysis
 
+To run data preparation and figure generation, use:
+
+    ./run.sh
+
