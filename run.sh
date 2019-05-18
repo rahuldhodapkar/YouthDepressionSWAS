@@ -14,4 +14,6 @@ mkdir -p calc
 
 cd src
 ./Main.R
+./GenFigures.R
+./TestByAge.R
 
