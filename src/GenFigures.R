@@ -4,6 +4,8 @@
 #
 
 library(ggplot2)
+library(ggdendro)
+library(ggpubr)
 library(hashmap)
 library(stringr)
 library(ggsci)
@@ -58,6 +60,11 @@ ggplot(plottable_merged_df, aes(x=LOD.youth, y=LOD.adult)) +
         axis.text = element_text(size=20));
 
 ggsave('../calc/AdultYouthScatter.png', height = 8, width = 8)
+
+print(paste(nrow(plottable_merged_df), "valid variables plotted", sep=" "));
+plottable_lm <- lm(LOD.youth ~ LOD.adult, data = plottable_merged_df);
+print("linear model of LOD.youth ~ LOD.adult")
+summary(plottable_lm)
 
 #########################################################################
 ## Recode Questions
@@ -213,19 +220,45 @@ adult_renamed_pt_df <- data.frame(
 
 barbox_renamed_df <- rbind(youth_renamed_pt_df, adult_renamed_pt_df)
 barbox_renamed_df$name <- str_wrap(barbox_renamed_df$name, width=50)
+barbox_renamed_df$name_reorder <- factor(barbox_renamed_df$name, 
+                                         levels = str_wrap(hc$labels[hc$order], width=50))
 
-ggplot(barbox_renamed_df, aes(x=name, y=lod, group=Age, color=Age)) +
+p2 <- ggplot(barbox_renamed_df, aes(x=name_reorder, y=lod, group=Age, color=Age)) +
   geom_pointrange(aes(ymin=min_x, ymax=max_x)) + coord_flip() +
-  ylab(bquote(log(OR))) + xlab('Survey Variable') + geom_hline(yintercept=0)
+  ylab(bquote(log(OR))) + xlab('') + geom_hline(yintercept=0)
 # Use geom_pointrange
+p2
 
 ht <- 6;
 aspect_ratio <- 20/12;
 
 ggsave('../calc/diff_questions_renamed.png', height = ht, width = ht*aspect_ratio)
 
+#########################################################################
+## Extract Dendrogram Plot Data
+#########################################################################
+print("Plot different questions")
+
+dhc <- as.dendrogram(hc)
+ddata <- dendro_data(dhc, type = "rectangle")
+
+p <- ggplot(segment(ddata)) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) + 
+  coord_flip() + 
+  scale_y_reverse(expand = c(0.1, 0)) + theme_dendro()
+p
+
+ggsave('../calc/dendro_no_labels.png', height = ht, width = ht*aspect_ratio)
+
+pdendro <- p + theme(plot.margin=unit(c(0.8, 0, 1.5, 1),"cm"))
+pcore <- p2 + theme(plot.margin=unit(c(1, 1, 1, 0), "cm"))
+
+ggarrange(pdendro, pcore, ncol = 2, nrow = 1, widths = c(1, 4))
+
+ggsave('../calc/linked_dendro_core.png', height = ht, width = ht*aspect_ratio)
+
 # Remove ggplots issue file for ggsave() bug
 # https://github.com/tidyverse/ggplot2/issues/2787
-file.exists("Rplots.pdf");
-file.remove("Rplots.pdf");
-
+if (file.exists("Rplots.pdf")) {
+  file.remove("Rplots.pdf");
+}
