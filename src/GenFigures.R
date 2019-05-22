@@ -146,7 +146,7 @@ diff_renamed_fig_df$Name[diff_renamed_fig_df$Name == 'IRMCDCHP'] <-
 
 # DIFFTHINK
 diff_renamed_fig_df$Name[diff_renamed_fig_df$Name == 'DIFFTHINK'] <-
-  'Serious difficulty concentrating, remembering, or making decisions';
+  'Serious difficulty concentrating, remembering, or making decisions due to condition*';
 
 # CAIDCHIP
 diff_renamed_fig_df$Name[diff_renamed_fig_df$Name == 'CAIDCHIP'] <-
