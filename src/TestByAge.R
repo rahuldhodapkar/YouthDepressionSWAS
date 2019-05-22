@@ -108,30 +108,45 @@ age_df <- data.frame(
     onset_ages_50_plus
   ),
   group = c(
-    rep('12-17', length(onset_ages_12_17)),
-    rep('18-25', length(onset_ages_18_25)),
-    rep('26-34', length(onset_ages_26_34)),
-    rep('35-49', length(onset_ages_35_49)),
-    rep('50+', length(onset_ages_50_plus))
+    rep(paste('12-17 (n=', length(onset_ages_12_17), ')', sep=''), 
+          length(onset_ages_12_17)),
+    rep(paste('18-25 (n=', length(onset_ages_18_25), ')', sep=''),
+          length(onset_ages_18_25)),
+    rep(paste('26-34 (n=', length(onset_ages_26_34), ')', sep=''), 
+          length(onset_ages_26_34)),
+    rep(paste('35-49 (n=', length(onset_ages_35_49), ')', sep=''),
+          length(onset_ages_35_49)),
+    rep(paste('50+ (n=', length(onset_ages_50_plus), ')', sep=''),
+         length(onset_ages_50_plus))
   )
 );
 
 ggplot(age_df, aes(x=age, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   xlab('Recalled Age of First MDE') +
-  labs(color="Age Group", fill="Age Group") + 
-  ggtitle('Lifetime Depression')
+  labs(color="Age Group", fill="Age Group")
 
 ggsave('../calc/lifetime_coarse_onset_age.png', width = 8, height = 7)
 
 all_age_df <- subset(rdf, AMDELT == 1 
                      & ADPBAGE < 150);
-all_age_df$group <- agecode2minage[[all_age_df$AGE2]]
+
+agecode2age_with_size <- hashmap(
+  unique(all_age_df$AGE2),
+  sapply(unique(all_age_df$AGE2), function(x) {
+    paste(agecode2minage[[x]], 
+          " (n=", sum(all_age_df$AGE2 == x, na.rm = T), ")", 
+          sep = '');
+  })
+)
+
+all_age_df$group <- agecode2age_with_size[[all_age_df$AGE2]]
 ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   labs(color="Age Group", fill="Age Group") + 
-  xlab('Recalled Age of First MDE') +
-  ggtitle('Lifetime Depression') 
+  xlab('Recalled Age of First MDE')
 
 ggsave('../calc/lifetime_granular_onset_age.png', width = 8, height = 7)
 
@@ -179,30 +194,43 @@ age_df <- data.frame(
     onset_ages_50_plus
   ),
   group = c(
-    rep('12-17', length(onset_ages_12_17)),
-    rep('18-25', length(onset_ages_18_25)),
-    rep('26-34', length(onset_ages_26_34)),
-    rep('35-49', length(onset_ages_35_49)),
-    rep('50+', length(onset_ages_50_plus))
+    rep(paste('12-17 (n=', length(onset_ages_12_17), ')', sep=''), 
+        length(onset_ages_12_17)),
+    rep(paste('18-25 (n=', length(onset_ages_18_25), ')', sep=''),
+        length(onset_ages_18_25)),
+    rep(paste('26-34 (n=', length(onset_ages_26_34), ')', sep=''), 
+        length(onset_ages_26_34)),
+    rep(paste('35-49 (n=', length(onset_ages_35_49), ')', sep=''),
+        length(onset_ages_35_49)),
+    rep(paste('50+ (n=', length(onset_ages_50_plus), ')', sep=''),
+        length(onset_ages_50_plus))
   )
 );
 
 ggplot(age_df, aes(x=age, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   xlab('Recalled Age of First MDE') +
-  labs(color="Age Group", fill="Age Group") + 
-  ggtitle('Active (Past-Year) Depression')
+  labs(color="Age Group", fill="Age Group")
 
 ggsave('../calc/active_coarse_onset_age.png', width = 8, height = 7)
 
 all_age_df <- subset(rdf, AMDEYR == 1 
                      & ADPBAGE < 150);
-all_age_df$group <- agecode2minage[[all_age_df$AGE2]]
+agecode2age_with_size <- hashmap(
+  unique(all_age_df$AGE2),
+  sapply(unique(all_age_df$AGE2), function(x) {
+    paste(agecode2minage[[x]], 
+          " (n=", sum(all_age_df$AGE2 == x, na.rm = T), ")", 
+          sep = '');
+  })
+)
+all_age_df$group <- agecode2age_with_size[[all_age_df$AGE2]]
 ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   xlab('Recalled Age of First MDE') +
-  labs(color="Age Group", fill="Age Group") + 
-  ggtitle('Active (Past-Year) Depression')
+  labs(color="Age Group", fill="Age Group")
 
 ggsave('../calc/active_granular_onset_age.png', width = 8, height = 7)
 
@@ -255,29 +283,42 @@ age_df <- data.frame(
     onset_ages_50_plus
   ),
   group = c(
-    rep('12-17', length(onset_ages_12_17)),
-    rep('18-25', length(onset_ages_18_25)),
-    rep('26-34', length(onset_ages_26_34)),
-    rep('35-49', length(onset_ages_35_49)),
-    rep('50+', length(onset_ages_50_plus))
+    rep(paste('12-17 (n=', length(onset_ages_12_17), ')', sep=''), 
+        length(onset_ages_12_17)),
+    rep(paste('18-25 (n=', length(onset_ages_18_25), ')', sep=''),
+        length(onset_ages_18_25)),
+    rep(paste('26-34 (n=', length(onset_ages_26_34), ')', sep=''), 
+        length(onset_ages_26_34)),
+    rep(paste('35-49 (n=', length(onset_ages_35_49), ')', sep=''),
+        length(onset_ages_35_49)),
+    rep(paste('50+ (n=', length(onset_ages_50_plus), ')', sep=''),
+        length(onset_ages_50_plus))
   )
 );
 
 ggplot(age_df, aes(x=age, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   xlab('Recalled Age of First MDE') +
-  labs(color="Age Group", fill="Age Group") + 
-  ggtitle('Liftime, Not Active (Past-Year) Depression')
+  labs(color="Age Group", fill="Age Group")
 
 ggsave('../calc/lifetime_not_active_coarse_onset_age.png', width = 8, height = 7)
 
 all_age_df <- subset(rdf, AMDEYR == 2 & AMDELT == 1
                      & ADPBAGE < 150);
-all_age_df$group <- agecode2minage[[all_age_df$AGE2]]
+agecode2age_with_size <- hashmap(
+  unique(all_age_df$AGE2),
+  sapply(unique(all_age_df$AGE2), function(x) {
+    paste(agecode2minage[[x]], 
+          " (n=", sum(all_age_df$AGE2 == x, na.rm = T), ")", 
+          sep = '');
+  })
+)
+all_age_df$group <- agecode2age_with_size[[all_age_df$AGE2]]
 ggplot(all_age_df, aes(x=ADPBAGE, color=group, fill=group)) +
   geom_density(alpha=0.4) +
+  scale_x_continuous(breaks = seq(0, 100, 5)) +
   xlab('Recalled Age of First MDE') +
-  labs(color="Age Group", fill="Age Group") + 
-  ggtitle('Liftime, Not Active (Past-Year) Depression')
+  labs(color="Age Group", fill="Age Group")
 
 ggsave('../calc/lifetime_not_active_granular_onset_age.png', width = 8, height = 7)
