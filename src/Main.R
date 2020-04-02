@@ -44,30 +44,53 @@ swas_scan <- function(rdf, ENDPOINT, ENDPOINT.SCREENABLE.VALS, conf.level=0.95) 
     
     if (dim(contingency_tab)[1] == 2 && dim(contingency_tab)[2] == 2) {
       test_results <- fisher.test(contingency_tab, conf.level = conf.level);
+      manual.or.est <- (
+        (contingency_tab[[1,1]] * contingency_tab[[2,2]])
+        / (contingency_tab[[1,2]] * contingency_tab[[2,1]])
+      )
     } else {
       test_results <- list(
         p_value = Inf,
         estimate = NA
       )
+      manual.or.est <- NA
     }
+
+
     
+    valid.val.freqs <- table(t_df[,compare_colname])
+
+    if (length(valid.val.freqs) == 0) {
+      valid.val.freqs <- c(0, 0)
+    } else if (length(valid.val.freqs) == 1) {
+      valid.val.freqs <- c(valid.val.freqs, 0)
+    }
+
     list(
       QNAME=as.character(comparable_fields$ColName)[i],
       VALS=dim(t_df)[1],
+      VAR=var(t_df[,compare_colname]),
+      N_1=valid.val.freqs[[1]],
+      N_2=valid.val.freqs[[2]],
       P_VALUE=as.numeric(test_results$p.value),
       CONF_LOW=as.numeric(test_results$conf.int[1]),
       CONF_HIGH=as.numeric(test_results$conf.int[2]),
-      ODDS_RATIO=as.numeric(test_results$estimate)
+      ODDS_RATIO=as.numeric(test_results$estimate),
+      MANUAL_ODDS_RATIO=manual.or.est
     )
   })
 
   summary_df <- data.frame(
     Name = as.character(sapply(raw_assoc_list, function(x) { x['QNAME'] })),
     NVals = as.integer(sapply(raw_assoc_list, function(x) { x['VALS'] })),
+    NVal1 = as.integer(sapply(raw_assoc_list, function(x) { x['N_1'] })),
+    NVal2 = as.integer(sapply(raw_assoc_list, function(x) { x['N_2'] })),
+    Var = as.numeric(sapply(raw_assoc_list, function(x) { x['VAR'] })),
     PValue = as.numeric(sapply(raw_assoc_list, function(x) { x['P_VALUE'] })),
     ConfLow = as.numeric(sapply(raw_assoc_list, function(x) { x['CONF_LOW'] })),
     ConfHigh = as.numeric(sapply(raw_assoc_list, function(x) { x['CONF_HIGH'] })),
-    OddsRatio = as.numeric(sapply(raw_assoc_list, function(x) { x['ODDS_RATIO'] }))
+    OddsRatio = as.numeric(sapply(raw_assoc_list, function(x) { x['ODDS_RATIO'] })),
+    ManOddsRatio = as.numeric(sapply(raw_assoc_list, function(x) { x['MANUAL_ODDS_RATIO'] }))
   );
 
   return(summary_df);

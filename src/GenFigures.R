@@ -10,6 +10,7 @@ library(hashmap)
 library(stringr)
 library(ggsci)
 library(ape)
+library(DescTools)
 
 #########################################################################
 ## Load Data
@@ -47,8 +48,8 @@ print("Generate Scatter")
 
 plottable_merged_df <- merged_df;
 plottable_merged_df <- subset(plottable_merged_df, 
-                              is.finite(OddsRatio.youth) & is.finite(OddsRatio.adult)
-                              & OddsRatio.youth != 0 & OddsRatio.adult != 0);
+                              abs(log10(ConfLow.youth) - log10(ConfHigh.youth)) < 3
+                              & abs(log10(ConfLow.adult) - log10(ConfHigh.adult)) < 3);
 plottable_merged_df$LOD.youth <- log10(plottable_merged_df$OddsRatio.youth);
 plottable_merged_df$LOD.adult <- log10(plottable_merged_df$OddsRatio.adult);
 
@@ -65,6 +66,9 @@ print(paste(nrow(plottable_merged_df), "valid variables plotted", sep=" "));
 plottable_lm <- lm(LOD.youth ~ LOD.adult, data = plottable_merged_df);
 print("linear model of LOD.youth ~ LOD.adult")
 summary(plottable_lm)
+
+lin.corr <- CCC(plottable_merged_df$LOD.youth, plottable_merged_df$LOD.adult)
+print(lin.corr$rho.c)
 
 #########################################################################
 ## Recode Questions
